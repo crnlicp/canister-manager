@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.mops/
+.icp/cache/
+src/bindings/
+*.local
+test-results/
+playwright-report/

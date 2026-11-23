@@ -1,0 +1,18 @@
+[toolchain]
+moc = "1.15.1"
+
+[moc]
+args = [ "--default-persistent-actors", "-W=M0223,M0236,M0237" ]
+
+[canisters.backend]
+main = "src/backend/main.mo"
+candid = "src/backend/backend.did"
+
+[canisters.backend.migrations]
+chain = "src/backend/migrations"
+
+[canisters.backend.check-stable]
+path = "deployed/backend.most"
+
+[dependencies]
+core = "2.6.1"

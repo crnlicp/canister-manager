@@ -1,0 +1,277 @@
+// Version: 4.0.0
+type Account__13682971 = {entries : [Entry__993924177]; lastRequest : Int};
+type Data__265875254<K, V> = {var count : Nat__58649523; kvs : [var ?(K, V)]};
+type Entry__804969078 =
+  {
+    addedAt : Int;
+    history : [{at : Int; cycles : Nat}];
+    id : Principal;
+    lastAttempt : Int;
+    lastError : ?Text;
+    name : Text;
+    snapshot : ?{at : Int; details : Status__867659519}
+  };
+type Entry__993924177 =
+  {
+    addedAt : Int;
+    history : [Point__72154957];
+    id : Principal;
+    lastAttempt : Int;
+    lastError : ?Text;
+    name : Text;
+    snapshot : ?Snapshot__496633661
+  };
+type Internal__161573640<K, V> =
+  {children : [var ?Node__430031793<K, V>]; data : Data__265875254<K, V>};
+type Leaf__1045638083<K, V> = {data : Data__265875254<K, V>};
+type Map__13625999<K, V> =
+  {var root : Node__430031793<K, V>; var size : Nat__58649523};
+type Map__386906547<K, V> = Map__670138087<K, V>;
+type Map__670138087<K, V> = Map__13625999<K, V>;
+type Memory__531915296 =
+  {
+    canister_history_size : Nat;
+    custom_sections_size : Nat;
+    global_memory_size : Nat;
+    snapshots_size : Nat;
+    stable_memory_size : Nat;
+    wasm_binary_size : Nat;
+    wasm_chunk_store_size : Nat;
+    wasm_memory_size : Nat
+  };
+type Nat__58649523 = Nat__920180692;
+type Nat__920180692 = Nat;
+type NewActor__713883069 =
+  {
+    projectAccounts :
+      Map__386906547<Principal,
+                      {nextId : Nat; projects : [Project__957535337]}>
+  };
+type NewActor__887040362 =
+  {
+    accounts :
+      Map__386906547<Principal,
+                      {entries : [Entry__804969078]; lastRequest : Int}>
+  };
+type NewActor__889690482 =
+  {
+    accounts :
+      Map__386906547<Principal,
+                      {entries : [NewEntry__665233638]; lastRequest : Int}>
+  };
+type NewEntry__665233638 =
+  {
+    addedAt : Int;
+    history : [{at : Int; cycles : Nat}];
+    id : Principal;
+    lastAttempt : Int;
+    lastError : ?Text;
+    name : Text;
+    snapshot : ?{at : Int; details : NewStatus__660566003}
+  };
+type NewSettings__1010388458 =
+  {
+    compute_allocation : Nat;
+    controllers : [Principal];
+    freezing_threshold : Nat;
+    log_memory_limit : ?Nat;
+    log_visibility : ?Visibility__584409080;
+    memory_allocation : Nat;
+    reserved_cycles_limit : Nat;
+    snapshot_visibility : ?Visibility__584409080;
+    status_visibility : ?Visibility__584409080;
+    wasm_memory_limit : ?Nat;
+    wasm_memory_threshold : ?Nat
+  };
+type NewStatus__660566003 =
+  {
+    cycles : Nat;
+    idle_cycles_burned_per_day : Nat;
+    memory_metrics :
+      ?{
+         canister_history_size : Nat;
+         custom_sections_size : Nat;
+         global_memory_size : Nat;
+         log_memory_store_size : ?Nat;
+         snapshots_size : Nat;
+         stable_memory_size : Nat;
+         wasm_binary_size : Nat;
+         wasm_chunk_store_size : Nat;
+         wasm_memory_size : Nat
+       };
+    memory_size : Nat;
+    module_hash : ?Blob;
+    query_stats :
+      {
+        num_calls_total : Nat;
+        num_instructions_total : Nat;
+        request_payload_bytes_total : Nat;
+        response_payload_bytes_total : Nat
+      };
+    ready_for_migration : ?Bool;
+    reserved_cycles : Nat;
+    settings : NewSettings__1010388458;
+    status : {#running; #stopped; #stopping};
+    version : ?Nat64
+  };
+type Node__430031793<K, V> =
+  {#internal : Internal__161573640<K, V>; #leaf : Leaf__1045638083<K, V>};
+type OldActor__128002834 =
+  {
+    accounts :
+      Map__386906547<Principal,
+                      {entries : [OldEntry__31026297]; lastRequest : Int}>
+  };
+type OldActor__138508408 = {};
+type OldActor__844469876 = {};
+type OldEntry__31026297 =
+  {
+    addedAt : Int;
+    history : [{at : Int; cycles : Nat}];
+    id : Principal;
+    lastAttempt : Int;
+    lastError : ?Text;
+    name : Text;
+    snapshot : ?{at : Int; details : OldStatus__839712611}
+  };
+type OldSettings__359821972 =
+  {
+    compute_allocation : Nat;
+    controllers : [Principal];
+    freezing_threshold : Nat;
+    log_visibility : ?Visibility__584409080;
+    memory_allocation : Nat;
+    reserved_cycles_limit : Nat;
+    wasm_memory_limit : ?Nat;
+    wasm_memory_threshold : ?Nat
+  };
+type OldStatus__839712611 =
+  {
+    cycles : Nat;
+    idle_cycles_burned_per_day : Nat;
+    memory_metrics : ?Memory__531915296;
+    memory_size : Nat;
+    module_hash : ?Blob;
+    query_stats :
+      {
+        num_calls_total : Nat;
+        num_instructions_total : Nat;
+        request_payload_bytes_total : Nat;
+        response_payload_bytes_total : Nat
+      };
+    reserved_cycles : Nat;
+    settings : OldSettings__359821972;
+    status : {#running; #stopped; #stopping}
+  };
+type Point__72154957 = {at : Int; cycles : Nat};
+type ProjectAccount__855511739 =
+  {nextId : Nat; projects : [Project__555744494]};
+type Project__555744494 = {canisterIds : [Principal]; id : Nat; name : Text};
+type Project__957535337 = {canisterIds : [Principal]; id : Nat; name : Text};
+type Settings__201412053 =
+  {
+    compute_allocation : Nat;
+    controllers : [Principal];
+    freezing_threshold : Nat;
+    log_visibility :
+      ?{#allowed_viewers : [Principal]; #controllers; #public_};
+    memory_allocation : Nat;
+    reserved_cycles_limit : Nat;
+    wasm_memory_limit : ?Nat;
+    wasm_memory_threshold : ?Nat
+  };
+type Settings__430587319 =
+  {
+    compute_allocation : Nat;
+    controllers : [Principal];
+    freezing_threshold : Nat;
+    log_memory_limit : ?Nat;
+    log_visibility : ?Visibility__834646432;
+    memory_allocation : Nat;
+    reserved_cycles_limit : Nat;
+    snapshot_visibility : ?Visibility__834646432;
+    status_visibility : ?Visibility__834646432;
+    wasm_memory_limit : ?Nat;
+    wasm_memory_threshold : ?Nat
+  };
+type Snapshot__496633661 = {at : Int; details : Status__44754529};
+type Status__44754529 =
+  {
+    cycles : Nat;
+    idle_cycles_burned_per_day : Nat;
+    memory_metrics :
+      ?{
+         canister_history_size : Nat;
+         custom_sections_size : Nat;
+         global_memory_size : Nat;
+         log_memory_store_size : ?Nat;
+         snapshots_size : Nat;
+         stable_memory_size : Nat;
+         wasm_binary_size : Nat;
+         wasm_chunk_store_size : Nat;
+         wasm_memory_size : Nat
+       };
+    memory_size : Nat;
+    module_hash : ?Blob;
+    query_stats :
+      {
+        num_calls_total : Nat;
+        num_instructions_total : Nat;
+        request_payload_bytes_total : Nat;
+        response_payload_bytes_total : Nat
+      };
+    ready_for_migration : ?Bool;
+    reserved_cycles : Nat;
+    settings : Settings__430587319;
+    status : {#running; #stopped; #stopping};
+    version : ?Nat64
+  };
+type Status__867659519 =
+  {
+    cycles : Nat;
+    idle_cycles_burned_per_day : Nat;
+    memory_metrics :
+      ?{
+         canister_history_size : Nat;
+         custom_sections_size : Nat;
+         global_memory_size : Nat;
+         snapshots_size : Nat;
+         stable_memory_size : Nat;
+         wasm_binary_size : Nat;
+         wasm_chunk_store_size : Nat;
+         wasm_memory_size : Nat
+       };
+    memory_size : Nat;
+    module_hash : ?Blob;
+    query_stats :
+      {
+        num_calls_total : Nat;
+        num_instructions_total : Nat;
+        request_payload_bytes_total : Nat;
+        response_payload_bytes_total : Nat
+      };
+    reserved_cycles : Nat;
+    settings : Settings__201412053;
+    status : {#running; #stopped; #stopping}
+  };
+type Visibility__584409080 =
+  {#allowed_viewers : [Principal]; #controllers; #public_};
+type Visibility__834646432 =
+  {#allowed_viewers : [Principal]; #controllers; #public_};
+{
+  "20261029_105400" : (_old : OldActor__138508408) -> NewActor__887040362;
+  "20261029_110500" : (old : OldActor__128002834) -> NewActor__889690482;
+  "20261029_111300" : (_old : OldActor__844469876) -> NewActor__713883069
+}
+actor  {
+  stable accounts :
+    {
+      var root : Node__430031793<Principal, Account__13682971>;
+      var size : Nat__58649523
+    };
+  stable projectAccounts :
+    {
+      var root : Node__430031793<Principal, ProjectAccount__855511739>;
+      var size : Nat__58649523
+    }
+};
