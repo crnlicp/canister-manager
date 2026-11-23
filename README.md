@@ -28,20 +28,28 @@ and backend deploy as ICP canisters; no centralized application server is needed
 - Explicitly labeled, read-only demo workspace. **Demo values are invented, not
   actual balances or health of the named public canisters.**
 
+## Layout
+
+Flat ICP layout: `icp.yaml` lists `canisters/*`.
+
+- `canisters/backend/` — Motoko canister (`mops.toml`, `src/`, `test/`, `deployed/`)
+- `canisters/frontend/` — React + Vite static site (`app/`, `public/`, `tests/`)
+
+The root `package.json` only delegates to the canister folders.
+
 ## Run locally
 
 Requires Node.js 22.16+, `icp`, `ic-wasm`, and `mops`.
 
 ```sh
-npm ci
-mops install
+npm run install:all   # npm ci in canisters/frontend, mops install in canisters/backend
 icp network start
 ```
 
 In another terminal:
 
 ```sh
-icp deploy -y
+icp deploy -y --identity anonymous
 ```
 
 Open **http://frontend.local.localhost:8001**. The project uses port 8001 so it
@@ -56,7 +64,7 @@ The managed local network accepts II's delegations. Your principal is specific t
 the app origin, so moving to another origin may require granting access again.
 There is no need to enter your deployment identity password into the dashboard.
 
-For UI-only development, `npm run generate && npm run dev` starts Vite.
+For UI-only development, `npm run dev` starts Vite.
 The demo works there. **Live calls require the `ic_env` cookie from the
 ICP-hosted frontend**; use the deployed frontend for end-to-end testing.
 Canister IDs and the local root key are read from that cookie, not baked into
@@ -66,9 +74,9 @@ For encrypted CLI identities, append
 `--identity-password-file "$HOME/.identity-pw"` to deployment commands rather
 than printing or putting the password into an argument.
 
-If Node tools fail with `SELF_SIGNED_CERT_IN_CHAIN` on a managed workstation,
-use its already-configured system trust store, for example
-`NODE_OPTIONS=--use-system-ca mops install`. Do not disable TLS verification.
+If Node tools fail with `SELF_SIGNED_CERT_IN_CHAIN` or `CERT_SIGNATURE_FAILURE`
+behind a TLS-inspecting proxy, point `NODE_EXTRA_CA_CERTS` at the proxy's root CA.
+Do not disable TLS verification.
 
 ## Read-only monitoring setup
 
@@ -144,7 +152,7 @@ refresh updates and public `read_state` metadata are certificate-verified.
 ```sh
 npm test
 npm run test:backend
-mops check
+npm run check:backend
 npm run build
 # After local deployment; mutates only the managed local test network:
 npm run test:integration
@@ -160,11 +168,11 @@ without printing its contents:
 ICP_IDENTITY_PASSWORD_FILE="$HOME/.identity-pw" npm run test:integration
 ```
 
-`npm run generate` regenerates the Candid interface from Motoko.
+`npm run generate` regenerates `canisters/backend/src/backend.did` from Motoko.
 Vite's `@icp-sdk/bindgen` plugin regenerates typed frontend bindings from that
 interface. Commit source, Candid, `mops.lock`, and `package-lock.json`; generated
 TypeScript bindings and build caches are ignored.
-After a backend deployment, run `mops deployed backend` to update the committed
+After a backend deployment, run `mops deployed backend` in `canisters/backend/` to update the committed
 stable-type baseline used by `mops check`. Applied migration files are immutable.
 
 ## Mainnet deployment

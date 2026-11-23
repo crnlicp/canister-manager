@@ -4,17 +4,20 @@ import { readFileSync } from "node:fs";
 import { Actor, HttpAgent, StatePaths } from "@icp-sdk/core/agent";
 import { Ed25519KeyIdentity } from "@icp-sdk/core/identity";
 import { Principal } from "@icp-sdk/core/principal";
-import { idlFactory } from "../src/bindings/declarations/backend.did.js";
+import { idlFactory } from "../app/bindings/declarations/backend.did.js";
 
+// Local runs never use the default (mainnet) identity unless ICP_IDENTITY says so.
+const identityArgs = [
+  "--identity",
+  process.env.ICP_IDENTITY ?? "anonymous",
+  ...(process.env.ICP_IDENTITY_PASSWORD_FILE
+    ? ["--identity-password-file", process.env.ICP_IDENTITY_PASSWORD_FILE]
+    : []),
+];
 const cli = (...args) =>
   execFileSync(
     "icp",
-    [
-      ...(process.env.ICP_IDENTITY_PASSWORD_FILE
-        ? ["--identity-password-file", process.env.ICP_IDENTITY_PASSWORD_FILE]
-        : []),
-      ...args,
-    ],
+    [...args, ...(args[0] === "network" ? [] : identityArgs)],
     { encoding: "utf8" },
   );
 const network = JSON.parse(cli("network", "status", "--json"));
@@ -27,7 +30,10 @@ assert.ok(
   "Refusing to mutate a remote network.",
 );
 const mappings = JSON.parse(
-  readFileSync(".icp/cache/mappings/local.ids.json", "utf8"),
+  readFileSync(
+    new URL("../../../.icp/cache/mappings/local.ids.json", import.meta.url),
+    "utf8",
+  ),
 );
 const backendId = mappings.backend;
 const frontendId = mappings.frontend;

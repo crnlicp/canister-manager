@@ -1,16 +1,5 @@
 canisters:
-  - name: backend
-    recipe:
-      type: "@dfinity/motoko@v5.0.0"
-  - name: frontend
-    recipe:
-      type: "@dfinity/static-site@v0.4.0"
-      configuration:
-        dir: dist
-        build:
-          - npm ci
-          - npm run generate
-          - npm run build
+  - canisters/*
 networks:
   - name: local
     mode: managed

@@ -2,7 +2,7 @@ node_modules/
 dist/
 .mops/
 .icp/cache/
-src/bindings/
+canisters/frontend/app/bindings/
 *.local
 test-results/
 playwright-report/

@@ -5,11 +5,12 @@ moc = "1.15.1"
 args = [ "--default-persistent-actors", "-W=M0223,M0236,M0237" ]
 
 [canisters.backend]
-main = "src/backend/main.mo"
-candid = "src/backend/backend.did"
+main = "src/main.mo"
+candid = "src/backend.did"
 
 [canisters.backend.migrations]
-chain = "src/backend/migrations"
+chain = "src/migrations"
+check-limit = 1
 
 [canisters.backend.check-stable]
 path = "deployed/backend.most"

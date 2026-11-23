@@ -1,6 +1,6 @@
 import Principal "mo:core/Principal";
-import Types "../src/backend/types";
-import Watchlist "../src/backend/lib/watchlist";
+import Types "../src/types";
+import Watchlist "../src/lib/watchlist";
 
 let owner = Principal.fromText("rdmx6-jaaaa-aaaaa-aaadq-cai");
 let viewer = Principal.fromText("ryjl3-tyaaa-aaaaa-aaaba-cai");

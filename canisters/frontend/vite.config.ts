@@ -5,7 +5,7 @@ import { icpBindgen } from "@icp-sdk/bindgen/plugins/vite";
 export default defineConfig({
   plugins: [
     react(),
-    icpBindgen({ didFile: "src/backend/backend.did", outDir: "src/bindings" }),
+    icpBindgen({ didFile: "../backend/src/backend.did", outDir: "app/bindings" }),
   ],
   build: {
     rollupOptions: {
