@@ -1,7 +1,7 @@
 // Version: 4.0.0
-type Account__13682971 = {entries : [Entry__993924177]; lastRequest : Int};
+type Account__558780827 = {entries : [Entry__839301555]; lastRequest : Int};
 type Data__265875254<K, V> = {var count : Nat__58649523; kvs : [var ?(K, V)]};
-type Entry__804969078 =
+type Entry__21776780 =
   {
     addedAt : Int;
     history : [{at : Int; cycles : Nat}];
@@ -9,17 +9,17 @@ type Entry__804969078 =
     lastAttempt : Int;
     lastError : ?Text;
     name : Text;
-    snapshot : ?{at : Int; details : Status__867659519}
+    snapshot : ?{at : Int; details : Status__987063478}
   };
-type Entry__993924177 =
+type Entry__839301555 =
   {
     addedAt : Int;
-    history : [Point__72154957];
+    history : [Point__2665823];
     id : Principal;
     lastAttempt : Int;
     lastError : ?Text;
     name : Text;
-    snapshot : ?Snapshot__496633661
+    snapshot : ?Snapshot__875771208
   };
 type Internal__161573640<K, V> =
   {children : [var ?Node__430031793<K, V>]; data : Data__265875254<K, V>};
@@ -28,7 +28,7 @@ type Map__13625999<K, V> =
   {var root : Node__430031793<K, V>; var size : Nat__58649523};
 type Map__386906547<K, V> = Map__670138087<K, V>;
 type Map__670138087<K, V> = Map__13625999<K, V>;
-type Memory__531915296 =
+type Memory__640045406 =
   {
     canister_history_size : Nat;
     custom_sections_size : Nat;
@@ -41,25 +41,25 @@ type Memory__531915296 =
   };
 type Nat__58649523 = Nat__920180692;
 type Nat__920180692 = Nat;
-type NewActor__713883069 =
+type NewActor__731968035 =
+  {
+    accounts :
+      Map__386906547<Principal,
+                      {entries : [NewEntry__927269461]; lastRequest : Int}>
+  };
+type NewActor__798744890 =
+  {
+    accounts :
+      Map__386906547<Principal,
+                      {entries : [Entry__21776780]; lastRequest : Int}>
+  };
+type NewActor__804781555 =
   {
     projectAccounts :
       Map__386906547<Principal,
-                      {nextId : Nat; projects : [Project__957535337]}>
+                      {nextId : Nat; projects : [Project__22190449]}>
   };
-type NewActor__887040362 =
-  {
-    accounts :
-      Map__386906547<Principal,
-                      {entries : [Entry__804969078]; lastRequest : Int}>
-  };
-type NewActor__889690482 =
-  {
-    accounts :
-      Map__386906547<Principal,
-                      {entries : [NewEntry__665233638]; lastRequest : Int}>
-  };
-type NewEntry__665233638 =
+type NewEntry__927269461 =
   {
     addedAt : Int;
     history : [{at : Int; cycles : Nat}];
@@ -67,23 +67,23 @@ type NewEntry__665233638 =
     lastAttempt : Int;
     lastError : ?Text;
     name : Text;
-    snapshot : ?{at : Int; details : NewStatus__660566003}
+    snapshot : ?{at : Int; details : NewStatus__405010169}
   };
-type NewSettings__1010388458 =
+type NewSettings__426526985 =
   {
     compute_allocation : Nat;
     controllers : [Principal];
     freezing_threshold : Nat;
     log_memory_limit : ?Nat;
-    log_visibility : ?Visibility__584409080;
+    log_visibility : ?Visibility__1018237321;
     memory_allocation : Nat;
     reserved_cycles_limit : Nat;
-    snapshot_visibility : ?Visibility__584409080;
-    status_visibility : ?Visibility__584409080;
+    snapshot_visibility : ?Visibility__1018237321;
+    status_visibility : ?Visibility__1018237321;
     wasm_memory_limit : ?Nat;
     wasm_memory_threshold : ?Nat
   };
-type NewStatus__660566003 =
+type NewStatus__405010169 =
   {
     cycles : Nat;
     idle_cycles_burned_per_day : Nat;
@@ -110,21 +110,21 @@ type NewStatus__660566003 =
       };
     ready_for_migration : ?Bool;
     reserved_cycles : Nat;
-    settings : NewSettings__1010388458;
+    settings : NewSettings__426526985;
     status : {#running; #stopped; #stopping};
     version : ?Nat64
   };
 type Node__430031793<K, V> =
   {#internal : Internal__161573640<K, V>; #leaf : Leaf__1045638083<K, V>};
-type OldActor__128002834 =
+type OldActor__599851907 = {};
+type OldActor__663222112 = {};
+type OldActor__853221478 =
   {
     accounts :
       Map__386906547<Principal,
-                      {entries : [OldEntry__31026297]; lastRequest : Int}>
+                      {entries : [OldEntry__869241304]; lastRequest : Int}>
   };
-type OldActor__138508408 = {};
-type OldActor__844469876 = {};
-type OldEntry__31026297 =
+type OldEntry__869241304 =
   {
     addedAt : Int;
     history : [{at : Int; cycles : Nat}];
@@ -132,24 +132,24 @@ type OldEntry__31026297 =
     lastAttempt : Int;
     lastError : ?Text;
     name : Text;
-    snapshot : ?{at : Int; details : OldStatus__839712611}
+    snapshot : ?{at : Int; details : OldStatus__83822298}
   };
-type OldSettings__359821972 =
+type OldSettings__454232455 =
   {
     compute_allocation : Nat;
     controllers : [Principal];
     freezing_threshold : Nat;
-    log_visibility : ?Visibility__584409080;
+    log_visibility : ?Visibility__1018237321;
     memory_allocation : Nat;
     reserved_cycles_limit : Nat;
     wasm_memory_limit : ?Nat;
     wasm_memory_threshold : ?Nat
   };
-type OldStatus__839712611 =
+type OldStatus__83822298 =
   {
     cycles : Nat;
     idle_cycles_burned_per_day : Nat;
-    memory_metrics : ?Memory__531915296;
+    memory_metrics : ?Memory__640045406;
     memory_size : Nat;
     module_hash : ?Blob;
     query_stats :
@@ -160,15 +160,29 @@ type OldStatus__839712611 =
         response_payload_bytes_total : Nat
       };
     reserved_cycles : Nat;
-    settings : OldSettings__359821972;
+    settings : OldSettings__454232455;
     status : {#running; #stopped; #stopping}
   };
-type Point__72154957 = {at : Int; cycles : Nat};
-type ProjectAccount__855511739 =
-  {nextId : Nat; projects : [Project__555744494]};
-type Project__555744494 = {canisterIds : [Principal]; id : Nat; name : Text};
-type Project__957535337 = {canisterIds : [Principal]; id : Nat; name : Text};
-type Settings__201412053 =
+type Point__2665823 = {at : Int; cycles : Nat};
+type ProjectAccount__892677970 =
+  {nextId : Nat; projects : [Project__670088084]};
+type Project__22190449 = {canisterIds : [Principal]; id : Nat; name : Text};
+type Project__670088084 = {canisterIds : [Principal]; id : Nat; name : Text};
+type Settings__634063632 =
+  {
+    compute_allocation : Nat;
+    controllers : [Principal];
+    freezing_threshold : Nat;
+    log_memory_limit : ?Nat;
+    log_visibility : ?Visibility__703639332;
+    memory_allocation : Nat;
+    reserved_cycles_limit : Nat;
+    snapshot_visibility : ?Visibility__703639332;
+    status_visibility : ?Visibility__703639332;
+    wasm_memory_limit : ?Nat;
+    wasm_memory_threshold : ?Nat
+  };
+type Settings__674514196 =
   {
     compute_allocation : Nat;
     controllers : [Principal];
@@ -180,22 +194,8 @@ type Settings__201412053 =
     wasm_memory_limit : ?Nat;
     wasm_memory_threshold : ?Nat
   };
-type Settings__430587319 =
-  {
-    compute_allocation : Nat;
-    controllers : [Principal];
-    freezing_threshold : Nat;
-    log_memory_limit : ?Nat;
-    log_visibility : ?Visibility__834646432;
-    memory_allocation : Nat;
-    reserved_cycles_limit : Nat;
-    snapshot_visibility : ?Visibility__834646432;
-    status_visibility : ?Visibility__834646432;
-    wasm_memory_limit : ?Nat;
-    wasm_memory_threshold : ?Nat
-  };
-type Snapshot__496633661 = {at : Int; details : Status__44754529};
-type Status__44754529 =
+type Snapshot__875771208 = {at : Int; details : Status__230885163};
+type Status__230885163 =
   {
     cycles : Nat;
     idle_cycles_burned_per_day : Nat;
@@ -222,11 +222,11 @@ type Status__44754529 =
       };
     ready_for_migration : ?Bool;
     reserved_cycles : Nat;
-    settings : Settings__430587319;
+    settings : Settings__634063632;
     status : {#running; #stopped; #stopping};
     version : ?Nat64
   };
-type Status__867659519 =
+type Status__987063478 =
   {
     cycles : Nat;
     idle_cycles_burned_per_day : Nat;
@@ -251,27 +251,27 @@ type Status__867659519 =
         response_payload_bytes_total : Nat
       };
     reserved_cycles : Nat;
-    settings : Settings__201412053;
+    settings : Settings__674514196;
     status : {#running; #stopped; #stopping}
   };
-type Visibility__584409080 =
+type Visibility__1018237321 =
   {#allowed_viewers : [Principal]; #controllers; #public_};
-type Visibility__834646432 =
+type Visibility__703639332 =
   {#allowed_viewers : [Principal]; #controllers; #public_};
 {
-  "20261029_105400" : (_old : OldActor__138508408) -> NewActor__887040362;
-  "20261029_110500" : (old : OldActor__128002834) -> NewActor__889690482;
-  "20261029_111300" : (_old : OldActor__844469876) -> NewActor__713883069
+  "20261029_105400" : (_old : OldActor__663222112) -> NewActor__798744890;
+  "20261029_110500" : (old : OldActor__853221478) -> NewActor__731968035;
+  "20261029_111300" : (_old : OldActor__599851907) -> NewActor__804781555
 }
 actor  {
   stable accounts :
     {
-      var root : Node__430031793<Principal, Account__13682971>;
+      var root : Node__430031793<Principal, Account__558780827>;
       var size : Nat__58649523
     };
   stable projectAccounts :
     {
-      var root : Node__430031793<Principal, ProjectAccount__855511739>;
+      var root : Node__430031793<Principal, ProjectAccount__892677970>;
       var size : Nat__58649523
     }
 };
