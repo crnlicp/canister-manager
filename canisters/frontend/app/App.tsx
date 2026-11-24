@@ -29,7 +29,6 @@ import {
   LayoutGrid,
   List,
   LoaderCircle,
-  LogOut,
   Menu,
   Plus,
   RefreshCw,
@@ -46,6 +45,7 @@ import type { Backend, Entry, Project } from "./bindings/backend";
 import { CycleChart, Sparkline } from "./components/Chart";
 import { CanisterDetails } from "./components/CanisterDetails";
 import { Modal } from "./components/Modal";
+import { AccountMenu } from "./components/AccountMenu";
 import { Settings } from "./components/Settings";
 import { Projects } from "./components/Projects";
 import { demoEntries, demoProjects } from "./lib/demo";
@@ -561,19 +561,15 @@ export default function App() {
             </button>
             <div className="topbar-divider" />
             {principal ? (
-              <button
-                className="account-button"
-                onClick={() =>
+              <AccountMenu
+                principal={principal}
+                notify={notify}
+                onSignOut={() =>
                   void auth
                     .signOut()
                     .catch((error) => notify(errorMessage(error), true))
                 }
-                title="Sign out"
-              >
-                <span className="account-avatar">II</span>
-                <span>{principal.slice(0, 7)}…</span>
-                <LogOut size={14} />
-              </button>
+              />
             ) : (
               <button
                 className="button secondary login-button"

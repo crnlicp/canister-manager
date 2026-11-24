@@ -552,6 +552,67 @@ button:not(:disabled):active {
   font-size: 10px;
   color: #aab8bf;
 }
+.account-menu {
+  position: relative;
+}
+.account-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 900;
+  width: min(320px, calc(100vw - 32px));
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #c4e7d621;
+  background: linear-gradient(125deg, #1d292cf5, #121d23fa);
+  backdrop-filter: blur(32px);
+  box-shadow: 0 20px 60px #0008;
+  color: #dbe5e7;
+}
+.account-popover-label {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.account-principal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #0b141880;
+}
+.account-principal code {
+  flex: 1;
+  min-width: 0;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #c1e8ce;
+  overflow-wrap: anywhere;
+}
+.account-principal .icon-button {
+  flex: none;
+  padding: 5px;
+}
+.account-signout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: transparent;
+  color: #e7c9a6;
+  font-size: 12px;
+  text-align: left;
+}
+.account-signout:hover,
+.account-signout:focus-visible {
+  background: #e4b47e14;
+}
 .account-avatar {
   display: grid;
   place-items: center;
