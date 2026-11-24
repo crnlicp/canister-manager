@@ -4,7 +4,10 @@ import { Variant_stopped_stopping_running } from "../bindings/backend";
 import { demoEntries } from "./demo";
 import {
   bytes,
+  compact,
   cycles,
+  runway,
+  runwayDays,
   health,
   hex,
   json,
@@ -147,5 +150,28 @@ describe("display helpers and sample integrity", () => {
       expect(entry.history.length).toBe(32);
       expect(entry.history.at(-1)?.cycles).toBe(entry.snapshot?.details.cycles);
     }
+  });
+});
+
+describe("idle runway", () => {
+  const status = demoEntries()[0].snapshot!.details;
+  it("divides balance by idle burn", () => {
+    expect(
+      runwayDays({ ...status, cycles: 10n, idle_cycles_burned_per_day: 3n }),
+    ).toBe(3n);
+    expect(
+      runway({ ...status, cycles: 10n, idle_cycles_burned_per_day: 10n }),
+    ).toBe("1 day");
+  });
+  it("never divides by zero or overstates long runways", () => {
+    expect(runway({ ...status, idle_cycles_burned_per_day: 0n })).toBe(
+      "No idle burn",
+    );
+    expect(
+      runway({ ...status, cycles: 10_000n, idle_cycles_burned_per_day: 1n }),
+    ).toBe("10+ years");
+  });
+  it("formats call counts compactly", () => {
+    expect(compact(12_480n)).toBe("12.5K");
   });
 });

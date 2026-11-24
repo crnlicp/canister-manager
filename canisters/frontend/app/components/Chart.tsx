@@ -24,6 +24,7 @@ export function Sparkline({
     <svg
       className={`sparkline ${warning ? "warning" : ""}`}
       viewBox="0 0 96 30"
+      preserveAspectRatio="none"
       aria-label="Cycle balance trend"
       role="img"
     >
@@ -32,6 +33,7 @@ export function Sparkline({
         fill="none"
         stroke="currentColor"
         strokeWidth="1.7"
+        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

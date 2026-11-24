@@ -1,13 +1,5 @@
 import { useState, type FormEvent } from "react";
-import {
-  FolderPlus,
-  Folder,
-  Layers3,
-  Pencil,
-  Trash2,
-  RefreshCw,
-  ArrowUpRight,
-} from "lucide-react";
+import { FolderPlus, Pencil, Plus, Trash2, RefreshCw } from "lucide-react";
 import type { Entry, Project } from "../bindings/backend";
 import { bytes, cycles } from "../lib/format";
 import { projectFor, scopeEntries, summarize } from "../lib/projects";
@@ -24,6 +16,7 @@ type Props = {
   onDelete: (id: bigint) => Promise<boolean>;
   onAssign: (canisterId: string, projectId: string) => Promise<void>;
   onRefresh: (entries: Entry[]) => void;
+  onAdd: () => void;
 };
 
 export function Projects({
@@ -37,6 +30,7 @@ export function Projects({
   onDelete,
   onAssign,
   onRefresh,
+  onAdd,
 }: Props) {
   const [editing, setEditing] = useState<{ id: bigint | null; name: string }>();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -46,12 +40,6 @@ export function Projects({
   const selectedProject = projects.find(
     (project) => project.id.toString() === scope,
   );
-  const scopeName =
-    scope === "all"
-      ? "All projects"
-      : scope === "ungrouped"
-        ? "Ungrouped"
-        : (selectedProject?.name ?? "All projects");
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!editing) return;
@@ -65,80 +53,45 @@ export function Projects({
   return (
     <>
       <section className="projects-section" aria-label="Project monitoring">
-        <header className="project-heading">
-          <div>
-            <span className="eyebrow">ONE WORKSPACE. EVERY PROJECT.</span>
-            <h2>
-              Organize your orbit{" "}
-              <span className="count-pill">{projects.length} projects</span>
-            </h2>
-          </div>
-          <button
-            className="button primary"
-            onClick={() => {
-              setEditing({ id: null, name: "" });
-              setConfirmDelete(false);
-            }}
-          >
-            <FolderPlus size={15} />
-            New project
-          </button>
-        </header>
-        <div className="project-cards">
-          {[
-            { key: "all", name: "All projects", icon: Layers3 },
-            ...projects.map((project) => ({
-              key: project.id.toString(),
-              name: project.name,
-              icon: Folder,
-            })),
-            { key: "ungrouped", name: "Ungrouped", icon: Folder },
-          ].map((item) => {
-            const totals = summarize(scopeEntries(entries, projects, item.key));
-            return (
-              <button
-                key={item.key}
-                aria-pressed={scope === item.key}
-                className={`project-card ${scope === item.key ? "selected" : ""}`}
-                onClick={() => onScope(item.key)}
-              >
-                <span className="project-card-top">
-                  <item.icon size={17} />
-                  <span>
-                    {totals.count} canister{totals.count !== 1 ? "s" : ""}
-                  </span>
-                  <ArrowUpRight size={14} />
-                </span>
-                <strong>{item.name}</strong>
-                <span className="project-card-balance">
-                  {totals.reported ? cycles(totals.cycles) : "—"}
-                  <small>available cycles</small>
-                </span>
-                <span className="project-card-bottom">
-                  <span>
-                    {totals.reported}/{totals.count} reported
-                  </span>
-                  <span
-                    className={totals.attention ? "amber-text" : "mint-text"}
-                  >
-                    {totals.attention
-                      ? `${totals.attention} need attention`
-                      : totals.count
-                        ? "All healthy"
-                        : "No canisters"}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
         <div className="glass project-scope">
           <div className="project-scope-heading">
             <div>
               <span className="eyebrow">MONITORING SCOPE</span>
-              <h2>{scopeName}</h2>
+              <h2>
+                <select
+                  className="scope-select"
+                  aria-label="Monitoring scope"
+                  value={scope}
+                  onChange={(event) => onScope(event.target.value)}
+                >
+                  <option value="all">All projects</option>
+                  {projects.map((project) => (
+                    <option
+                      key={project.id.toString()}
+                      value={project.id.toString()}
+                    >
+                      {project.name}
+                    </option>
+                  ))}
+                  <option value="ungrouped">Ungrouped</option>
+                </select>
+              </h2>
             </div>
             <div className="inline-actions">
+              <button
+                className="button secondary small-button"
+                onClick={() => {
+                  setEditing({ id: null, name: "" });
+                  setConfirmDelete(false);
+                }}
+              >
+                <FolderPlus size={13} />
+                New project
+              </button>
+              <button className="button primary small-button" onClick={onAdd}>
+                <Plus size={13} />
+                Add canister
+              </button>
               <button
                 className="button secondary small-button"
                 disabled={demo || busy || !scoped.length}

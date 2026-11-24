@@ -1,5 +1,5 @@
 import { Principal } from "@icp-sdk/core/principal";
-import type { Entry } from "../bindings/backend";
+import type { Entry, Status } from "../bindings/backend";
 
 export const TRILLION = 1_000_000_000_000n;
 export const DAY_NS = 86_400_000_000_000n;
@@ -27,6 +27,26 @@ export function timeAgo(at: bigint, now = Date.now()): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+// Idle-only estimate: execution and traffic costs are not in the snapshot.
+export function runwayDays(status: Status): bigint | undefined {
+  if (!status.idle_cycles_burned_per_day) return undefined;
+  return status.cycles / status.idle_cycles_burned_per_day;
+}
+
+export function runway(status: Status): string {
+  const days = runwayDays(status);
+  if (days === undefined) return "No idle burn";
+  if (days > 3650n) return "10+ years";
+  return `${days.toLocaleString("en-US")} day${days === 1n ? "" : "s"}`;
+}
+
+export function compact(value: bigint): string {
+  return Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
 export function validateCanisterId(input: string): Principal {

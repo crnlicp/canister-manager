@@ -24,6 +24,7 @@ import {
   Download,
   ExternalLink,
   Fingerprint,
+  Folder,
   Globe2,
   LayoutDashboard,
   LayoutGrid,
@@ -48,6 +49,7 @@ import { Modal } from "./components/Modal";
 import { AccountMenu } from "./components/AccountMenu";
 import { Settings } from "./components/Settings";
 import { Projects } from "./components/Projects";
+import { CopyId } from "./components/CopyId";
 import { demoEntries, demoProjects } from "./lib/demo";
 import {
   projectFor,
@@ -58,10 +60,13 @@ import {
 import { auth, backend, backendId, networkName } from "./lib/ic";
 import {
   bytes,
+  compact,
   cycles,
   download,
   errorMessage,
   health,
+  runway,
+  runwayDays,
   timeAgo,
   validateCanisterId,
 } from "./lib/format";
@@ -96,6 +101,7 @@ export default function App() {
   const [liveProjects, setLiveProjects] = useState<Project[]>([]);
   const [sampleProjects] = useState(demoProjects);
   const [scope, setScope] = useState("all");
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [addProject, setAddProject] = useState("ungrouped");
   const [view, setView] = useState<View>("Overview");
   const [query, setQuery] = useState("");
@@ -201,6 +207,47 @@ export default function App() {
         .includes(query.toLowerCase()) &&
       (filter === "All statuses" || health(entry) === filter),
   );
+  const groups = [
+    ...projects.map((project) => ({
+      key: project.id.toString(),
+      name: project.name,
+    })),
+    { key: "ungrouped", name: "Ungrouped" },
+  ]
+    .map((group) => ({
+      ...group,
+      entries: visible.filter(
+        (entry) =>
+          (projectFor(projects, entry.id.toText())?.id.toString() ??
+            "ungrouped") === group.key,
+      ),
+    }))
+    .filter((group) => group.entries.length);
+  const toggleGroup = (key: string) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    });
+  const groupToggle = (group: (typeof groups)[number]) => {
+    const open = !collapsed.has(group.key);
+    const total = summarize(group.entries);
+    return (
+      <button
+        className="group-toggle"
+        aria-expanded={open}
+        onClick={() => toggleGroup(group.key)}
+      >
+        <ChevronRight size={14} className="group-chevron" />
+        <Folder size={14} />
+        <strong>{group.name}</strong>
+        <span className="count-pill">{group.entries.length}</span>
+        <span className="group-total">
+          {total.reported ? cycles(total.cycles) : "—"}
+        </span>
+      </button>
+    );
+  };
   const snapshots = entries.flatMap((entry) =>
     entry.snapshot ? [entry.snapshot] : [],
   );
@@ -660,10 +707,6 @@ export default function App() {
                 <RefreshCw size={15} className={busy ? "spinning" : ""} />
                 <span>{busy ? "Refreshing…" : "Refresh all"}</span>
               </button>
-              <button className="button primary" onClick={openAdd}>
-                <Plus size={17} />
-                Add canister
-              </button>
             </div>
           </section>
           {view === "Settings" ? (
@@ -801,6 +844,7 @@ export default function App() {
                 }}
                 onAssign={assignProject}
                 onRefresh={(targets) => void refresh(targets)}
+                onAdd={openAdd}
               />
               {view !== "Canisters" && (
                 <div className="insights-grid">
@@ -1024,34 +1068,94 @@ export default function App() {
                   </div>
                 ) : visible.length ? (
                   grid ? (
-                    <div className="canister-grid">
-                      {visible.map((entry, index) => (
-                        <button
-                          className="canister-tile"
-                          key={entry.id.toText()}
-                          onClick={() => setSelectedId(entry.id.toText())}
-                        >
-                          <div className={`canister-icon color-${index % 5}`}>
-                            <Box size={20} />
-                          </div>
-                          <h3>{entry.name}</h3>
-                          <code>{entry.id.toText()}</code>
-                          <span
-                            className={`badge ${health(entry).toLowerCase().replaceAll(" ", "-")}`}
-                          >
-                            <i />
-                            {health(entry)}
-                          </span>
-                          <div className="tile-balance">
-                            {entry.snapshot
-                              ? cycles(entry.snapshot.details.cycles)
-                              : "No snapshot"}
-                          </div>
-                          <Sparkline
-                            points={entry.history}
-                            warning={health(entry) === "Low cycles"}
-                          />
-                        </button>
+                    <div className="canister-groups">
+                      {groups.map((group) => (
+                        <section className="canister-group" key={group.key}>
+                          {groupToggle(group)}
+                          {!collapsed.has(group.key) && (
+                            <div className="canister-grid">
+                              {group.entries.map((entry, index) => (
+                                <div
+                                  className="canister-tile"
+                                  key={entry.id.toText()}
+                                  onClick={() =>
+                                    setSelectedId(entry.id.toText())
+                                  }
+                                >
+                                  <div
+                                    className={`canister-icon color-${index % 5}`}
+                                  >
+                                    <Box size={20} />
+                                  </div>
+                                  <h3>
+                                    <button
+                                      className="canister-link"
+                                      onClick={() =>
+                                        setSelectedId(entry.id.toText())
+                                      }
+                                    >
+                                      {entry.name}
+                                    </button>
+                                  </h3>
+                                  <CopyId
+                                    id={entry.id.toText()}
+                                    notify={notify}
+                                  />
+                                  <span
+                                    className={`badge ${health(entry).toLowerCase().replaceAll(" ", "-")}`}
+                                  >
+                                    <i />
+                                    {health(entry)}
+                                  </span>
+                                  <div className="tile-balance">
+                                    {entry.snapshot
+                                      ? cycles(entry.snapshot.details.cycles)
+                                      : "No snapshot"}
+                                  </div>
+                                  {entry.snapshot && (
+                                    <dl className="tile-stats">
+                                      <div>
+                                        <dt>Burn / day</dt>
+                                        <dd>
+                                          {cycles(
+                                            entry.snapshot.details
+                                              .idle_cycles_burned_per_day,
+                                          )}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt>Runway</dt>
+                                        <dd
+                                          className={
+                                            (runwayDays(
+                                              entry.snapshot.details,
+                                            ) ?? 31n) <= 30n
+                                              ? "amber-text"
+                                              : ""
+                                          }
+                                        >
+                                          {runway(entry.snapshot.details)}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt>Memory</dt>
+                                        <dd>
+                                          {bytes(
+                                            entry.snapshot.details.memory_size,
+                                          )}
+                                        </dd>
+                                      </div>
+                                    </dl>
+                                  )}
+                                  <Sparkline
+                                    points={entry.history}
+                                    warning={health(entry) === "Low cycles"}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </section>
                       ))}
                     </div>
                   ) : (
@@ -1064,82 +1168,169 @@ export default function App() {
                             <th>
                               CYCLE BALANCE <ChevronDown size={11} />
                             </th>
+                            <th>IDLE BURN / DAY</th>
+                            <th>RUNWAY</th>
                             <th>MEMORY</th>
+                            <th>CALLS</th>
                             <th>RECENT TREND</th>
                             <th aria-label="View details" />
                           </tr>
                         </thead>
-                        <tbody>
-                          {visible.map((entry, index) => (
-                            <tr key={entry.id.toText()}>
-                              <td>
-                                <button
-                                  className="canister-name-button"
-                                  onClick={() =>
-                                    setSelectedId(entry.id.toText())
-                                  }
-                                >
-                                  <span
-                                    className={`canister-icon color-${index % 5}`}
-                                  >
-                                    <Box size={18} />
-                                  </span>
-                                  <span>
-                                    <strong>{entry.name}</strong>
-                                    <code>{entry.id.toText()}</code>
-                                  </span>
-                                </button>
-                              </td>
-                              <td>
-                                <span
-                                  className={`badge ${health(entry).toLowerCase().replaceAll(" ", "-")}`}
-                                >
-                                  <i />
-                                  {health(entry)}
-                                </span>
-                              </td>
-                              <td>
-                                <span
-                                  className={`balance-cell ${health(entry) === "Low cycles" ? "amber-text" : ""}`}
-                                  title={entry.snapshot?.details.cycles.toLocaleString()}
-                                >
-                                  {entry.snapshot
-                                    ? cycles(entry.snapshot.details.cycles)
-                                    : "—"}
-                                </span>
-                                <span className="cell-caption">
-                                  {entry.snapshot
-                                    ? `Updated ${timeAgo(entry.snapshot.at)}`
-                                    : "Refresh to connect"}
-                                </span>
-                              </td>
-                              <td>
-                                <span className="memory-cell">
-                                  {entry.snapshot
-                                    ? bytes(entry.snapshot.details.memory_size)
-                                    : "—"}
-                                </span>
-                              </td>
-                              <td>
-                                <Sparkline
-                                  points={entry.history}
-                                  warning={health(entry) === "Low cycles"}
-                                />
-                              </td>
-                              <td>
-                                <button
-                                  className="icon-button row-arrow"
-                                  aria-label={`View ${entry.name}`}
-                                  onClick={() =>
-                                    setSelectedId(entry.id.toText())
-                                  }
-                                >
-                                  <ArrowUpRight size={17} />
-                                </button>
-                              </td>
+                        {groups.map((group) => (
+                          <tbody key={group.key}>
+                            <tr className="group-row">
+                              <th colSpan={9} scope="rowgroup">
+                                {groupToggle(group)}
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
+                            {!collapsed.has(group.key) &&
+                              group.entries.map((entry, index) => (
+                                <tr key={entry.id.toText()}>
+                                  <td>
+                                    <div className="canister-name-button">
+                                      <span
+                                        className={`canister-icon color-${index % 5}`}
+                                      >
+                                        <Box size={18} />
+                                      </span>
+                                      <span>
+                                        <button
+                                          className="canister-link"
+                                          onClick={() =>
+                                            setSelectedId(entry.id.toText())
+                                          }
+                                        >
+                                          <strong>{entry.name}</strong>
+                                        </button>
+                                        <CopyId
+                                          id={entry.id.toText()}
+                                          notify={notify}
+                                        />
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`badge ${health(entry).toLowerCase().replaceAll(" ", "-")}`}
+                                    >
+                                      <i />
+                                      {health(entry)}
+                                    </span>
+                                    {entry.snapshot && (
+                                      <span className="cell-caption">
+                                        {
+                                          entry.snapshot.details.settings
+                                            .controllers.length
+                                        }{" "}
+                                        controller
+                                        {entry.snapshot.details.settings
+                                          .controllers.length === 1
+                                          ? ""
+                                          : "s"}
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`balance-cell ${health(entry) === "Low cycles" ? "amber-text" : ""}`}
+                                      title={entry.snapshot?.details.cycles.toLocaleString()}
+                                    >
+                                      {entry.snapshot
+                                        ? cycles(entry.snapshot.details.cycles)
+                                        : "—"}
+                                    </span>
+                                    <span className="cell-caption">
+                                      {entry.snapshot
+                                        ? `Updated ${timeAgo(entry.snapshot.at)}`
+                                        : "Refresh to connect"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="memory-cell">
+                                      {entry.snapshot
+                                        ? cycles(
+                                            entry.snapshot.details
+                                              .idle_cycles_burned_per_day,
+                                          )
+                                        : "—"}
+                                    </span>
+                                    <span className="cell-caption">
+                                      Excludes execution
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`memory-cell ${entry.snapshot && (runwayDays(entry.snapshot.details) ?? 31n) <= 30n ? "amber-text" : ""}`}
+                                    >
+                                      {entry.snapshot
+                                        ? runway(entry.snapshot.details)
+                                        : "—"}
+                                    </span>
+                                    {entry.snapshot && (
+                                      <span className="cell-caption">
+                                        Freezes at{" "}
+                                        {(
+                                          entry.snapshot.details.settings
+                                            .freezing_threshold / 86_400n
+                                        ).toLocaleString("en-US")}
+                                        -day reserve
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span className="memory-cell">
+                                      {entry.snapshot
+                                        ? bytes(
+                                            entry.snapshot.details.memory_size,
+                                          )
+                                        : "—"}
+                                    </span>
+                                    {entry.snapshot?.details.memory_metrics && (
+                                      <span className="cell-caption">
+                                        Stable{" "}
+                                        {bytes(
+                                          entry.snapshot.details.memory_metrics
+                                            .stable_memory_size,
+                                        )}
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span className="memory-cell">
+                                      {entry.snapshot
+                                        ? compact(
+                                            entry.snapshot.details.query_stats
+                                              .num_calls_total,
+                                          )
+                                        : "—"}
+                                    </span>
+                                    {entry.snapshot && (
+                                      <span className="cell-caption">
+                                        Query calls
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <Sparkline
+                                      points={entry.history}
+                                      warning={health(entry) === "Low cycles"}
+                                    />
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="icon-button row-arrow"
+                                      aria-label={`View ${entry.name}`}
+                                      onClick={() =>
+                                        setSelectedId(entry.id.toText())
+                                      }
+                                    >
+                                      <ArrowUpRight size={17} />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        ))}
                       </table>
                     </div>
                   )
